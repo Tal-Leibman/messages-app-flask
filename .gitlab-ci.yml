@@ -13,9 +13,9 @@ stages:
 build:
   stage: build
   script:
-    - IMAGE_NAME=registry.gitlab.com/leibman2/${CI_PROJECT_NAME}:release-`date '+%Y-%m-%d-%H%M'`-${CI_COMMIT_SHA:0:9}
+    - IMAGE_NAME="registry.gitlab.com/leibman2/${CI_PROJECT_NAME}:release-`date '+%Y-%m-%d-%H%M'`-${CI_COMMIT_SHA:0:9}""
     - echo $IMAGE_NAME
-    - echo $$CI_COMMIT_SHA
+    - echo $CI_COMMIT_SHA
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - export DOCKER_BUILDKIT=1
     - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest --tag $IMAGE_NAME .
