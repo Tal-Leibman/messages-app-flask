@@ -2,6 +2,8 @@ import dataclasses
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+
+import bcrypt
 from dataclasses_json import DataClassJsonMixin
 from sqlalchemy import (
     Boolean,
@@ -13,10 +15,9 @@ from sqlalchemy import (
     LargeBinary,
 )
 from sqlalchemy.orm import relationship, object_session, Session, Query
-import bcrypt
-from .client import SqlTableDeclarativeBase
 from werkzeug.security import safe_str_cmp
-from uuid import uuid4
+
+from .client import SqlTableDeclarativeBase
 
 
 class Message(SqlTableDeclarativeBase):

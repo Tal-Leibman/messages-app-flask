@@ -1,13 +1,12 @@
 import logging
 import os
+import signal
 from contextlib import contextmanager
-from threading import Lock
-from typing import Optional
+
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.engine.base import Engine
-import signal
 
 ECHO_SQL_LOGS = os.getenv("ECHO_SQL_LOGS") == "1"
 SqlTableDeclarativeBase = declarative_base()

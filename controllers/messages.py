@@ -1,4 +1,3 @@
-import logging
 from operator import or_
 
 from flask import Blueprint, abort, request
@@ -14,7 +13,6 @@ from db import (
     MessageFetchRequestStatus,
 )
 
-log = logging.getLogger(__name__)
 messages_bp = Blueprint("messages", __name__)
 
 

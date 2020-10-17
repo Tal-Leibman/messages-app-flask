@@ -7,6 +7,10 @@ from db import sql_client_instance, User
 
 
 def auth_required(func):
+    """
+    check if a user has a valid Authorization header and return the wrapped function with the user_id
+    wrapped function must accept param user_id
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         auth_token = request.headers.get("Authorization", None)
