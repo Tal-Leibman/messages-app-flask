@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
@@ -67,3 +68,9 @@ class ParseWriteMessageRequest:
         self.subject = self.subject.strip()
         if not self.body and not self.subject:
             raise ValueError("no body or subject found in request")
+
+
+class MessageFetchRequestStatus(Enum):
+    read = "read"
+    unread = "unread"
+    all = "all"
