@@ -1,7 +1,13 @@
 import os
 
 from .mysql_client import MySqlClient, SqlTableDeclarativeBase
-from .models import Message, User, MessageResponse, ParseWriteMessageRequest
+from .models import (
+    Message,
+    User,
+    MessageResponse,
+    ParseWriteMessageRequest,
+    MessageFetchRequestStatus,
+)
 
 mysql_client_instance = MySqlClient.get_mysql_client(
     host=os.environ["MYSQL_HOST"],
