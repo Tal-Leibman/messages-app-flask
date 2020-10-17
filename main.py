@@ -7,7 +7,7 @@ from waitress import serve
 
 from controllers import messages_bp, users_bp
 
-IS_DEBUG = os.getenv("IS_DEBUG_ENVIRONMENT", "1") == "1"
+IS_DEBUG = os.getenv("IS_DEBUG_ENVIRONMENT", "0") == "1"
 FORMAT = (
     f"%(levelname).1s: %(asctime)s %(name)s %(threadName)s %(funcName)s : %(message)s"
 )
