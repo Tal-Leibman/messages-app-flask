@@ -1,1 +1,1 @@
-web: waitress-serve --port=5000  --call 'main:create_app'
+web: python server.py
