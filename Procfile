@@ -1,1 +1,1 @@
-web: waitress-serve --call 'main:create_app'
+web: waitress-serve --port=5000  --call 'main:create_app'
