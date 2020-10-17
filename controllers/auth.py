@@ -1,10 +1,9 @@
 from uuid import uuid4
 
 from flask import Blueprint, request, abort
-from sqlalchemy.orm import Session
 
 from auth_decorator import auth_required
-from db import sql_client_instance, User
+from models import User, db
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -12,45 +11,39 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/register", methods=["POST"])
 def register():
     validate_request_body(request.json)
-    with sql_client_instance.session_scope() as s:
-        s: Session
-        user = s.query(User).filter(User.email == request.json["email"]).first()
-        if user:
-            return abort(400)
-        new_user = User(email=request.json["email"])
-        new_user.password = request.json["password"]
-        token = str(uuid4())
-        new_user.auth_token = token
-        s.add(new_user)
-
+    user = User.query.filter(User.email == request.json["email"]).first()
+    if user:
+        return abort(400)
+    new_user = User(email=request.json["email"])
+    new_user.password = request.json["password"]
+    token = str(uuid4())
+    new_user.auth_token = token
+    db.session.add(new_user)
+    db.session.commit()
     return {"status": "ok", "auth_token": token}
 
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
     validate_request_body(request.json)
-    with sql_client_instance.session_scope() as s:
-        s: Session
-        user = s.query(User).filter(User.email == request.json["email"]).first()
-        if user is None:
-            abort(403)
-        user: User
-        if user.validate_password(request.json["password"]):
-            token = str(uuid4())
-            user.auth_token = token
-        else:
-            abort(403)
-
-    return {"status": "ok", "auth_token": token}
+    user = User.query.filter(User.email == request.json["email"]).first()
+    if user is None:
+        abort(403)
+    user: User
+    if user.validate_password(request.json["password"]):
+        token = str(uuid4())
+        user.auth_token = token
+        db.session.commit()
+        return {"status": "ok", "auth_token": token}
+    else:
+        abort(403)
 
 
 @auth_bp.route("/logout", methods=["DELETE"])
 @auth_required
-def logout(user_id: str):
-    with sql_client_instance.session_scope() as s:
-        s: Session
-        user: User = User.find_by_id(s, user_id)
-        user.auth_token = None
+def logout(user: User):
+    user.auth_token = None
+    db.session.commit()
     return {"status": "ok"}
 
 

@@ -13,6 +13,7 @@ psycopg2-binary = "*"
 waitress="*"
 dataclasses-json = "*"
 bcrypt = "*"
+Flask-SQLAlchemy = "*"
 
 [requires]
 python_version = "3.8"

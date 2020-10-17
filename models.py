@@ -5,6 +5,7 @@ from typing import Optional
 
 import bcrypt
 from dataclasses_json import DataClassJsonMixin
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import (
     Boolean,
     Column,
@@ -17,10 +18,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, object_session, Session, Query
 from werkzeug.security import safe_str_cmp
 
-from .client import SqlTableDeclarativeBase
+db = SQLAlchemy()
 
 
-class Message(SqlTableDeclarativeBase):
+class Message(db.Model):
     __tablename__ = "message"
     id = Column(Integer, primary_key=True, autoincrement=True)
 
@@ -36,7 +37,7 @@ class Message(SqlTableDeclarativeBase):
     is_read = Column(Boolean, nullable=False, default=0)
 
 
-class User(SqlTableDeclarativeBase):
+class User(db.Model):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(50), unique=True, nullable=False)
