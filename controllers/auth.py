@@ -3,6 +3,7 @@ from uuid import uuid4
 from flask import Blueprint, request, abort
 from sqlalchemy.orm import Session
 
+from auth_decorator import auth_required
 from db import sql_client_instance, User
 
 auth_bp = Blueprint("auth", __name__)
@@ -42,7 +43,17 @@ def login():
 
     return {"status": "ok", "auth_token": token}
 
-def validate_request_body(body:dict):
+
+@auth_bp.route("/logout", methods=["DELETE"])
+@auth_required
+def logout(user_id: str):
+    with sql_client_instance.session_scope() as s:
+        s: Session
+        user: User = User.find_by_id(s, user_id)
+        user.auth_token = None
+    return {"status": "ok"}
+
+
+def validate_request_body(body: dict):
     if "email" not in body or "password" not in body:
         abort(400, "body must contain password and email")
-
