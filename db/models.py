@@ -1,26 +1,33 @@
 import dataclasses
+from datetime import datetime
 
 from dataclasses_json import DataClassJsonMixin
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 
 from .mysql_client import SqlTableDeclarativeBase
 
 
 class User(SqlTableDeclarativeBase):
-    __tablename__ = "users"
+    __tablename__ = "user"
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(50), unique=True, nullable=False)
 
 
 class Message(SqlTableDeclarativeBase):
-    __tablename__ = "messages"
+    __tablename__ = "message"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    sender_id = Column(Integer, ForeignKey("users.id"))
-    receiver_id = Column(Integer, ForeignKey("users.id"))
-    body = Column(String(1000), unique=True, nullable=False)
-    subject = Column(String(160), unique=True, nullable=False)
-    timestamp = Column(Integer, nullable=False)
-    is_read = Column(Boolean, nullable=False)
+
+    sender_id = Column(Integer, ForeignKey("user.id"))
+    receiver_id = Column(Integer, ForeignKey("user.id"))
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
+
+    body = Column(String(1000), nullable=False)
+    subject = Column(String(160), nullable=False)
+    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+    is_read = Column(Boolean, nullable=False, default=0)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -29,3 +36,19 @@ class MessageResponse(DataClassJsonMixin):
     subject: str
     body: str
     timestamp: int
+
+
+@dataclasses.dataclass()
+class ParseWriteMessageRequest:
+    receiver_id: str
+    body: str
+    subject: str
+
+    def __post_init__(self):
+        self.receiver_id = self.receiver_id.strip()
+        if not self.receiver_id:
+            raise ValueError("no receiver_id in request")
+        self.body = self.body.strip()
+        self.subject = self.subject.strip()
+        if not self.body and not self.subject:
+            raise ValueError("no body or subject found in request")
