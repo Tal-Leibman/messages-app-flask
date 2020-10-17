@@ -91,9 +91,9 @@ def get_messages(user_id: str, status: str):
         if current_user is None:
             abort(400, f"{user_id=} not found")
         if status.value == MessageFetchRequestStatus.read.value:
-            messages = current_user.messages_received.filter(Message.is_read).all()
+            messages = current_user.messages_received.filter(Message.is_read == True).all()
         elif status.value == MessageFetchRequestStatus.unread.value:
-            messages = current_user.messages_received.filter(not Message.is_read).all()
+            messages = current_user.messages_received.filter(Message.is_read == False).all()
         elif status.value == MessageFetchRequestStatus.all.value:
             messages = current_user.messages_received.all()
         else:
