@@ -11,3 +11,5 @@
 ### Prod
 * the server will listen to requests on the port found in environment variable `PORT` 
 * `python server.py` to run waitress WSGI server
+### Formatter
+* Black for consistent code style  https://pypi.org/project/black/
