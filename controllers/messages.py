@@ -49,7 +49,7 @@ def read_message(user_id: str):
         if current_user is None:
             abort(404, f"{user_id=} not found")
         message = (
-            current_user.messages_received.filter(not Message.is_read)
+            current_user.messages_received.filter(Message.is_read == False)
             .order_by(Message.timestamp)
             .first()
         )
