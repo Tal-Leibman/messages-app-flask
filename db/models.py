@@ -46,10 +46,11 @@ class User(SqlTableDeclarativeBase):
 
 @dataclasses.dataclass(frozen=True)
 class MessageResponse(DataClassJsonMixin):
+    message_id: str
     sent_from: str
     subject: str
     body: str
-    timestamp: int
+    timestamp: str
 
 
 @dataclasses.dataclass()
