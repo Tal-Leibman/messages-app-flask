@@ -1,6 +1,6 @@
 import os
 
-from .mysql_client import MySqlClient, SqlTableDeclarativeBase
+from .client import SqlClient, SqlTableDeclarativeBase
 from .models import (
     Message,
     User,
@@ -9,11 +9,5 @@ from .models import (
     MessageFetchRequestStatus,
 )
 
-mysql_client_instance = MySqlClient.get_mysql_client(
-    host=os.environ["MYSQL_HOST"],
-    user=os.environ["MYSQL_USER"],
-    password=os.environ["MYSQL_PASSWORD"],
-    scheme=os.environ["mysql_schema"],
-)
-
-mysql_client_instance.create_all_tables()
+sql_client_instance = SqlClient(os.environ["DATABASE_URL"])
+sql_client_instance.create_all_tables()

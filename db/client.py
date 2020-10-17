@@ -14,11 +14,7 @@ SqlTableDeclarativeBase = declarative_base()
 log = logging.getLogger(__name__)
 
 
-class MySqlClient:
-    __CLIENT_TO_CONNECTION_STRING: dict = dict()
-    __LOCK = Lock()
-    __INSTANCE: Optional["MySqlClient"] = None
-
+class SqlClient:
     def __init__(self, connection_string: str):
         self.__engine: Engine = create_engine(
             connection_string,
@@ -55,21 +51,3 @@ class MySqlClient:
             raise error
         finally:
             session.close()
-
-    @classmethod
-    def get_mysql_client(
-        cls, user: str, host: str, scheme: str, password: str, port="3306"
-    ) -> "MySqlClient":
-        """
-        returns a single client foreach unique connection string
-        """
-        connection_string = (
-            f"mysql+pymysql://{user}:{password}@{host}:{port}/{scheme}?charset=utf8mb4"
-        )
-        with cls.__LOCK:
-            if connection_string not in cls.__CLIENT_TO_CONNECTION_STRING:
-                log.info(f"first connection to mysql at {host=}")
-                cls.__CLIENT_TO_CONNECTION_STRING[connection_string] = cls(
-                    connection_string
-                )
-            return cls.__CLIENT_TO_CONNECTION_STRING[connection_string]

@@ -6,7 +6,7 @@ from dataclasses_json import DataClassJsonMixin
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, object_session, Session, Query
 
-from .mysql_client import SqlTableDeclarativeBase
+from .client import SqlTableDeclarativeBase
 
 
 class Message(SqlTableDeclarativeBase):
