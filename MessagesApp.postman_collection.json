@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "c946a3f4-efbd-4c5b-8f90-2d8739f833bf",
+		"name": "MessagesApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "write_message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"subject\": \"hello\",\n    \"body\": \"Test message body\",\n    \"receiver_id\":\"3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://message-app-2020.herokuapp.com/messages/write/1",
+					"protocol": "https",
+					"host": [
+						"message-app-2020",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"messages",
+						"write",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "read_message",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://message-app-2020.herokuapp.com/messages/read/3",
+					"protocol": "https",
+					"host": [
+						"message-app-2020",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"messages",
+						"read",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"email\":\"test_5\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://message-app-2020.herokuapp.com/users/register",
+					"protocol": "https",
+					"host": [
+						"message-app-2020",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_messages",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://message-app-2020.herokuapp.com/messages/3/unread",
+					"protocol": "https",
+					"host": [
+						"message-app-2020",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"messages",
+						"3",
+						"unread"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_message",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/messages/5/7",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"messages",
+						"5",
+						"7"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
