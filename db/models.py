@@ -1,17 +1,11 @@
 import dataclasses
 from datetime import datetime
-
+from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, object_session, Session, Query
 
 from .mysql_client import SqlTableDeclarativeBase
-
-
-class User(SqlTableDeclarativeBase):
-    __tablename__ = "user"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(50), unique=True, nullable=False)
 
 
 class Message(SqlTableDeclarativeBase):
@@ -28,6 +22,26 @@ class Message(SqlTableDeclarativeBase):
     subject = Column(String(160), nullable=False)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
     is_read = Column(Boolean, nullable=False, default=0)
+
+
+class User(SqlTableDeclarativeBase):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String(50), unique=True, nullable=False)
+
+    @property
+    def messages_received(self) -> Query:
+        return (
+            object_session(self).query(Message).filter(Message.receiver_id == self.id)
+        )
+
+    @property
+    def messages_sent(self) -> Query:
+        return object_session(self).query(Message).filter(Message.sender_id == self.id)
+
+    @classmethod
+    def find_by_id(cls, session: Session, user_id: str) -> Optional["User"]:
+        return session.query(User).filter(User.id == user_id).first()
 
 
 @dataclasses.dataclass(frozen=True)
