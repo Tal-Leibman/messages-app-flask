@@ -6,11 +6,11 @@ verify_ssl = true
 [dev-packages]
 black = "==19.10b0"
 
-
 [packages]
 flask="*"
 sqlalchemy="*"
 PyMySQL = "*"
+psycopg2-binary = "*"
 waitress="*"
 dataclasses-json = "*"
 
