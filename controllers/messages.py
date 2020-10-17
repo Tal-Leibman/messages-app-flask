@@ -49,7 +49,7 @@ def read_message(user_id: str):
         if current_user is None:
             abort(404, f"{user_id=} not found")
         message = (
-            current_user.messages_received.filter(Message.is_read == 0)
+            current_user.messages_received.filter(not Message.is_read)
             .order_by(Message.timestamp)
             .first()
         )
@@ -91,9 +91,9 @@ def get_messages(user_id: str, status: str):
         if current_user is None:
             abort(400, f"{user_id=} not found")
         if status.value == MessageFetchRequestStatus.read.value:
-            messages = current_user.messages_received.filter(Message.is_read == 1).all()
+            messages = current_user.messages_received.filter(Message.is_read).all()
         elif status.value == MessageFetchRequestStatus.unread.value:
-            messages = current_user.messages_received.filter(Message.is_read == 0).all()
+            messages = current_user.messages_received.filter(not Message.is_read).all()
         elif status.value == MessageFetchRequestStatus.all.value:
             messages = current_user.messages_received.all()
         else:
