@@ -1,12 +1,9 @@
 import logging
-import os
 import sys
 
 from flask import Flask
+from controllers import messages_bp, auth_bp
 
-from controllers import messages_bp, users_bp
-
-IS_DEBUG = os.getenv("IS_DEBUG_ENVIRONMENT", "0") == "1"
 FORMAT = (
     f"%(levelname).1s: %(asctime)s %(name)s %(threadName)s %(funcName)s : %(message)s"
 )
@@ -17,16 +14,12 @@ log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.register_blueprint(messages_bp, url_prefix="/messages")
-app.register_blueprint(users_bp, url_prefix="/users")
+app.register_blueprint(auth_bp, url_prefix="/users")
 
 
 @app.route("/")
 def index():
     return "<h1>Welcome to Message app</h1>"
-
-
-def create_app():
-    return app
 
 
 if __name__ == "__main__":

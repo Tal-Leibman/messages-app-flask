@@ -3,10 +3,20 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 from dataclasses_json import DataClassJsonMixin
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    DateTime,
+    LargeBinary,
+)
 from sqlalchemy.orm import relationship, object_session, Session, Query
-
+import bcrypt
 from .client import SqlTableDeclarativeBase
+from werkzeug.security import safe_str_cmp
+from uuid import uuid4
 
 
 class Message(SqlTableDeclarativeBase):
@@ -29,6 +39,26 @@ class User(SqlTableDeclarativeBase):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(50), unique=True, nullable=False)
+    password_hash = Column(LargeBinary(128), unique=True, nullable=False)
+    password_salt = Column(LargeBinary(128), unique=True, nullable=False)
+    auth_token = Column(String(50), unique=True, nullable=True)
+
+    @property
+    def password(self):
+        raise AttributeError("password not readable")
+
+    @password.setter
+    def password(self, password: str):
+        salt = bcrypt.gensalt()
+        password_bytes = bytes(password, "utf-8")
+        self.password_salt = salt
+        self.password_hash = bcrypt.hashpw(password_bytes, salt)
+
+    def validate_password(self, password: str) -> bool:
+        password_bytes = bytes(password, "utf-8")
+        password_hash = bcrypt.hashpw(password_bytes, self.password_salt)
+        is_valid = safe_str_cmp(password_hash, self.password_hash)
+        return is_valid
 
     @property
     def messages_received(self) -> Query:

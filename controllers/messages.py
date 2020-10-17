@@ -4,6 +4,7 @@ from operator import or_
 from flask import Blueprint, abort, request
 from sqlalchemy.orm import Session
 
+from auth_decorator import auth_required
 from db import (
     sql_client_instance,
     User,
@@ -18,6 +19,7 @@ messages_bp = Blueprint("messages", __name__)
 
 
 @messages_bp.route("/write/<user_id>", methods=["POST"])
+@auth_required
 def write_message(user_id: str):
     with sql_client_instance.session_scope() as s:
         s: Session
@@ -42,6 +44,7 @@ def write_message(user_id: str):
 
 
 @messages_bp.route("/read/<user_id>", methods=["GET"])
+@auth_required
 def read_message(user_id: str):
     with sql_client_instance.session_scope() as s:
         s: Session
@@ -70,8 +73,8 @@ def read_message(user_id: str):
     return response.to_json()
 
 
-@messages_bp.route("/<user_id>", methods=["GET"], defaults={"status": "unread"})
-@messages_bp.route("/<user_id>/<status>", methods=["GET"])
+@messages_bp.route("/<status>", methods=["GET"])
+@auth_required
 def get_messages(user_id: str, status: str):
     """
     The task asked for a method to get all the messages , in reality this not to recommend and we should limit
@@ -91,9 +94,13 @@ def get_messages(user_id: str, status: str):
         if current_user is None:
             abort(400, f"{user_id=} not found")
         if status.value == MessageFetchRequestStatus.read.value:
-            messages = current_user.messages_received.filter(Message.is_read == True).all()
+            messages = current_user.messages_received.filter(
+                Message.is_read == True
+            ).all()
         elif status.value == MessageFetchRequestStatus.unread.value:
-            messages = current_user.messages_received.filter(Message.is_read == False).all()
+            messages = current_user.messages_received.filter(
+                Message.is_read == False
+            ).all()
         elif status.value == MessageFetchRequestStatus.all.value:
             messages = current_user.messages_received.all()
         else:
@@ -112,7 +119,8 @@ def get_messages(user_id: str, status: str):
         return {"status": "ok", "messages": messages_response}
 
 
-@messages_bp.route("/<user_id>/<message_id>", methods=["DELETE"])
+@messages_bp.route("/<message_id>", methods=["DELETE"])
+@auth_required
 def delete_message(user_id: str, message_id: str):
     with sql_client_instance.session_scope() as s:
         s: Session

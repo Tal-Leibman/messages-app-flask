@@ -1,2 +1,2 @@
 from .messages import messages_bp
-from .users import users_bp
+from .auth import auth_bp
