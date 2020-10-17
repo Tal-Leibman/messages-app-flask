@@ -5,7 +5,7 @@ from flask import Blueprint, abort, request
 from sqlalchemy.orm import Session
 
 from db import (
-    mysql_client_instance,
+    sql_client_instance,
     User,
     Message,
     MessageResponse,
@@ -19,7 +19,7 @@ messages_bp = Blueprint("messages", __name__)
 
 @messages_bp.route("/write/<user_id>", methods=["POST"])
 def write_message(user_id: str):
-    with mysql_client_instance.session_scope() as s:
+    with sql_client_instance.session_scope() as s:
         s: Session
         current_user = User.find_by_id(s, user_id)
         if current_user is None:
@@ -43,7 +43,7 @@ def write_message(user_id: str):
 
 @messages_bp.route("/read/<user_id>", methods=["GET"])
 def read_message(user_id: str):
-    with mysql_client_instance.session_scope() as s:
+    with sql_client_instance.session_scope() as s:
         s: Session
         current_user = User.find_by_id(s, user_id)
         if current_user is None:
@@ -84,7 +84,7 @@ def get_messages(user_id: str, status: str):
             400,
             f"Provided {status=} invalid, use {[_status.value for _status in MessageFetchRequestStatus]}",
         )
-    with mysql_client_instance.session_scope() as s:
+    with sql_client_instance.session_scope() as s:
         s: Session
         status: MessageFetchRequestStatus
         current_user = User.find_by_id(s, user_id)
@@ -114,7 +114,7 @@ def get_messages(user_id: str, status: str):
 
 @messages_bp.route("/<user_id>/<message_id>", methods=["DELETE"])
 def delete_message(user_id: str, message_id: str):
-    with mysql_client_instance.session_scope() as s:
+    with sql_client_instance.session_scope() as s:
         s: Session
         message = (
             s.query(Message)
