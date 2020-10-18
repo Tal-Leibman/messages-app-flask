@@ -2,18 +2,17 @@ from uuid import uuid4
 
 from flask import Blueprint, request, abort
 
-from auth_decorator import auth_required
+from decorators import auth_required, validate_email_password
 from models import User, db
 
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/register", methods=["POST"])
-def register():
-    validate_request_body(request.json)
-    user = User.query.filter(User.email == request.json["email"]).first()
+@validate_email_password
+def register(user: User):
     if user:
-        return abort(400)
+        return abort(403)
     new_user = User(email=request.json["email"])
     new_user.password = request.json["password"]
     token = str(uuid4())
@@ -24,12 +23,10 @@ def register():
 
 
 @auth_bp.route("/login", methods=["POST"])
-def login():
-    validate_request_body(request.json)
-    user = User.query.filter(User.email == request.json["email"]).first()
+@validate_email_password
+def login(user: User):
     if user is None:
         abort(403)
-    user: User
     if user.validate_password(request.json["password"]):
         token = str(uuid4())
         user.auth_token = token
@@ -45,8 +42,3 @@ def logout(user: User):
     user.auth_token = None
     db.session.commit()
     return {"status": "ok"}
-
-
-def validate_request_body(body: dict):
-    if "email" not in body or "password" not in body:
-        abort(400, "body must contain password and email")
