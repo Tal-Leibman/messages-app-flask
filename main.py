@@ -7,6 +7,12 @@ from flask import Flask
 from controllers import messages_bp, auth_bp
 from models import db
 
+
+try:
+    RUN_MODE = sys.argv[1]
+except IndexError:
+    RUN_MODE = None
+
 FORMAT = (
     f"%(levelname).1s: %(asctime)s %(name)s %(threadName)s %(funcName)s : %(message)s"
 )
@@ -24,5 +30,15 @@ app.register_blueprint(auth_bp, url_prefix="/users")
 
 
 if __name__ == "__main__":
-    log.info("starting flask dev server")
-    app.run("127.0.0.1", "5000", debug=True, use_reloader=True)
+    if RUN_MODE == "debug":
+        log.info("starting flask dev server")
+        app.run("127.0.0.1", "5000", debug=True, use_reloader=True)
+    elif RUN_MODE == "prod":
+        import waitress
+
+        port = os.environ["PORT"]
+        log.info(f"starting prod server {port=}")
+        waitress.serve(app, port=port)
+    else:
+        log.error("no cmd arg received call main.py with either debug or prod")
+        exit(-1)
