@@ -3,7 +3,7 @@ from operator import or_
 from flask import Blueprint, abort, request
 from models import db
 
-from auth_decorator import auth_required
+from decorators import auth_required
 from models import (
     User,
     Message,
@@ -19,9 +19,7 @@ messages_bp = Blueprint("messages", __name__)
 @auth_required
 def write_message(user: User):
     request_data = ParseWriteMessageRequest(**request.json)
-    message_receiver: User = User.query.filter(
-        User.id == request_data.receiver_id
-    ).first()
+    message_receiver = User.get_by_id(request_data.receiver_id)
     if message_receiver is None:
         abort(404, "message receiver not found")
     db.session.add(
@@ -46,7 +44,7 @@ def read_message(user: User):
     )
     if message is None:
         return {"status": f"no unread messages for {user.email=}"}
-    from_user: User = User.query.filter(User.id == message.receiver_id).first()
+    from_user = User.get_by_id(message.receiver_id)
     message: Message
     message.is_read = True
     db.session.commit()
@@ -81,7 +79,9 @@ def get_messages(user: User, status: str):
     elif status.value == MessageFetchRequestStatus.all.value:
         messages = user.messages_received.all()
     else:
-        raise RuntimeError
+        raise RuntimeError(
+            "MessageFetchRequestStatus enum may have been changed received value"
+        )
     messages_response = [
         MessageResponse(
             message_id=m.id,
