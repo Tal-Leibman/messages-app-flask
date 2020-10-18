@@ -15,7 +15,7 @@ from sqlalchemy import (
     DateTime,
     LargeBinary,
 )
-from sqlalchemy.orm import relationship, object_session, Session, Query
+from sqlalchemy.orm import relationship, Query
 from werkzeug.security import safe_str_cmp
 
 db = SQLAlchemy()
@@ -64,17 +64,23 @@ class User(db.Model):
 
     @property
     def messages_received(self) -> Query:
-        return (
-            object_session(self).query(Message).filter(Message.receiver_id == self.id)
-        )
+        return self.query(Message).filter(Message.receiver_id == self.id)
 
     @property
     def messages_sent(self) -> Query:
-        return object_session(self).query(Message).filter(Message.sender_id == self.id)
+        return self.query(Message).filter(Message.sender_id == self.id)
 
     @classmethod
-    def find_by_id(cls, session: Session, user_id: str) -> Optional["User"]:
-        return session.query(User).filter(User.id == user_id).first()
+    def get_by_id(cls, user_id: str) -> Optional["User"]:
+        return cls.query.filter(User.email == user_id).first()
+
+    @classmethod
+    def get_by_email(cls, email: str) -> Optional["User"]:
+        return cls.query.filter(User.email == email).first()
+
+    @classmethod
+    def get_by_token(cls, auth_token: str) -> Optional["User"]:
+        return cls.query.filter(auth_token == User.auth_token).first()
 
 
 @dataclasses.dataclass(frozen=True)
