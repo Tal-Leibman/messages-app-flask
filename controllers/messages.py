@@ -15,7 +15,7 @@ from models import (
 messages_bp = Blueprint("messages", __name__)
 
 
-@messages_bp.route("/write/<user_id>", methods=["POST"])
+@messages_bp.route("/write", methods=["POST"])
 @auth_required
 def write_message(user: User):
     request_data = ParseWriteMessageRequest(**request.json)
@@ -34,7 +34,7 @@ def write_message(user: User):
     return {"status": "ok"}
 
 
-@messages_bp.route("/read/<user_id>", methods=["GET"])
+@messages_bp.route("/read", methods=["GET"])
 @auth_required
 def read_message(user: User):
     message = (
