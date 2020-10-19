@@ -72,7 +72,7 @@ class User(db.Model):
 
     @classmethod
     def get_by_id(cls, user_id: str) -> Optional["User"]:
-        return cls.query.filter(User.email == user_id).first()
+        return cls.query.filter(User.id == user_id).first()
 
     @classmethod
     def get_by_email(cls, email: str) -> Optional["User"]:
