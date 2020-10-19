@@ -104,7 +104,9 @@ class ParseWriteMessageRequest:
         elif type(self.receiver_id) is str:
             self.receiver_id = self.receiver_id.strip()
         else:
-            raise TypeError(f"wrong type receiver_id must be either int or str : {type(self.receiver_id)}")
+            raise TypeError(
+                f"wrong type receiver_id must be either int or str : {type(self.receiver_id)}"
+            )
         if not self.receiver_id:
             raise ValueError("no receiver_id in request")
         self.body = self.body.strip()

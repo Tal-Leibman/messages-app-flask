@@ -19,7 +19,7 @@ def register(user: User):
     new_user.auth_token = token
     db.session.add(new_user)
     db.session.commit()
-    return {"status": "ok", "auth_token": token}
+    return {"status": "ok", "auth_token": token, "user_id": user.id}
 
 
 @auth_bp.route("/login", methods=["POST"])
@@ -31,7 +31,7 @@ def login(user: User):
         token = str(uuid4())
         user.auth_token = token
         db.session.commit()
-        return {"status": "ok", "auth_token": token}
+        return {"status": "ok", "auth_token": token, "user_id": user.id}
     else:
         abort(403)
 
