@@ -117,6 +117,6 @@ class ParseWriteMessageRequest:
 
 
 class MessageFetchRequestStatus(Enum):
-    read = "read"
-    unread = "unread"
+    all_read = "all_read"
+    all_unread = "all_unread"
     all = "all"

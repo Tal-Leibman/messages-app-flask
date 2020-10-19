@@ -72,9 +72,9 @@ def get_messages(user: User, status: str):
             400,
             f"Provided {status=} invalid, use {[_status.value for _status in MessageFetchRequestStatus]}",
         )
-    if status.value == MessageFetchRequestStatus.read.value:
+    if status.value == MessageFetchRequestStatus.all_read.value:
         messages = user.messages_received.filter(Message.is_read == True).all()
-    elif status.value == MessageFetchRequestStatus.unread.value:
+    elif status.value == MessageFetchRequestStatus.all_unread.value:
         messages = user.messages_received.filter(Message.is_read == False).all()
     elif status.value == MessageFetchRequestStatus.all.value:
         messages = user.messages_received.all()
