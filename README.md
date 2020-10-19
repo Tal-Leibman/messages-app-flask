@@ -13,3 +13,5 @@
 * `python main.py prod` to run waitress WSGI server
 ### Formatter
 * Black for consistent code style  https://pypi.org/project/black/
+### Tests
+* Use postman_collection.json and postman_environment.json in postman test runner
