@@ -64,11 +64,12 @@ class User(db.Model):
 
     @property
     def messages_received(self) -> Query:
-        return self.query(Message).filter(Message.receiver_id == self.id)
+        return Message.query.filter(Message.receiver_id == self.id)
 
     @property
     def messages_sent(self) -> Query:
-        return self.query(Message).filter(Message.sender_id == self.id)
+        return Message.query.filter(Message.sender_id == self.id)
+
 
     @classmethod
     def get_by_id(cls, user_id: str) -> Optional["User"]:
