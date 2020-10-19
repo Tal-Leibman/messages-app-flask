@@ -70,7 +70,6 @@ class User(db.Model):
     def messages_sent(self) -> Query:
         return Message.query.filter(Message.sender_id == self.id)
 
-
     @classmethod
     def get_by_id(cls, user_id: str) -> Optional["User"]:
         return cls.query.filter(User.id == user_id).first()

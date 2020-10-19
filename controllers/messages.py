@@ -1,7 +1,7 @@
+import os
 from operator import or_
 
 from flask import Blueprint, abort, request
-from models import db
 
 from decorators import auth_required
 from models import (
@@ -11,8 +11,10 @@ from models import (
     ParseWriteMessageRequest,
     MessageFetchRequestStatus,
 )
+from models import db
 
 messages_bp = Blueprint("messages", __name__)
+MAX_MESSAGES_FETCH_COUNT = int(os.getenv("MAX_MESSAGES_FETCH_COUNT", "5"))
 
 
 @messages_bp.route("/write", methods=["POST"])
@@ -62,8 +64,7 @@ def read_message(user: User):
 @auth_required
 def get_messages(user: User, status: str):
     """
-    The task asked for a method to get all the messages , in reality this not to recommend and we should limit
-    the amount of messages a single api call can fetch , using pagination and a cursor for following api calls
+    to use pagination send query params page and per_page
     """
     try:
         status = MessageFetchRequestStatus(status)
@@ -73,15 +74,20 @@ def get_messages(user: User, status: str):
             f"Provided {status=} invalid, use {[_status.value for _status in MessageFetchRequestStatus]}",
         )
     if status.value == MessageFetchRequestStatus.all_read.value:
-        messages = user.messages_received.filter(Message.is_read == True).all()
+        messages_query = user.messages_received.filter(Message.is_read == True)
     elif status.value == MessageFetchRequestStatus.all_unread.value:
-        messages = user.messages_received.filter(Message.is_read == False).all()
+        messages_query = user.messages_received.filter(Message.is_read == False)
     elif status.value == MessageFetchRequestStatus.all.value:
-        messages = user.messages_received.all()
+        messages_query = user.messages_received
     else:
         raise RuntimeError(
             "MessageFetchRequestStatus enum may have been changed received value"
         )
+    messages = (
+        messages_query.order_by(Message.timestamp)
+        .paginate(max_per_page=MAX_MESSAGES_FETCH_COUNT, error_out=False)
+        .items
+    )
     messages_response = [
         MessageResponse(
             message_id=m.id,
