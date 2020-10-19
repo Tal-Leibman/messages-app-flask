@@ -19,7 +19,7 @@ def register(user: User):
     new_user.auth_token = token
     db.session.add(new_user)
     db.session.commit()
-    return {"status": "ok", "auth_token": token, "user_id": user.id}
+    return {"status": "ok", "auth_token": token, "user_id": new_user.id}
 
 
 @auth_bp.route("/login", methods=["POST"])
