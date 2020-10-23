@@ -22,11 +22,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./Dockerfile
-          pull: true
+#          pull: true
           push: true
-
-          cache-from: type=registry,ref=tal-leibman/messages-app-flask
-          cache-to: type=inline
+#          cache-from: type=registry,ref=tal-leibman/messages-app-flask
+#          cache-to: type=inline
           tags: tal-leibman/messages-app-flask:latest
