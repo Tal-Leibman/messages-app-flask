@@ -22,3 +22,15 @@ services:
     network_mode: "host"
     ports:
       - "127.0.0.1:5000:5000"
+
+  api-test-newman:
+    image: postman/newman
+    depends_on:
+      - messages-app
+    network_mode: "host"
+    command: [ "newman","run","postman_collection.json" ,"--environment" ,"postman_environment.json" ]
+
+
+
+
+

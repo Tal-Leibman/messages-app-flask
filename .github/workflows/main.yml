@@ -24,14 +24,10 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          pull: true
           tags: ghcr.io/tal-leibman/messages-app-flask:latest
           cache-from: type=registry,ref=ghcr.io/tal-leibman/messages-app-flask:latest
           cache-to: type=inline
       - run:  docker-compose create
-      - run:  docker-compose up --detach
-      - run: echo docker-ps
-      - uses: matt-ball/newman-action@master
-        with:
-          collection: postman_collection.json
-          environment: postman_environment.json
+      - run:  docker-compose up
 
