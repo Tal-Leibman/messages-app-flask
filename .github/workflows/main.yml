@@ -9,8 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: DATE_STRING=`date +%Y_%m_%d_%H:%M`
+      - run: repo_name=$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]')
       - run: IMAGE_NAME="$GITHUB_REPOSITORY_$DATE_STRING:test_build"
       - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-      - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
-      - run: docker build . -t $IMAGE_NAME --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY
-      - run: docker tag $IMAGE_NAME docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY || true
+      - run: docker pull docker.pkg.github.com/$repo_name/build-cache-no-buildkit || true
+      - run: docker build . -t $IMAGE_NAME --cache-from=docker.pkg.github.com/$repo_name/$repo_name
+      - run: docker tag $IMAGE_NAME docker.pkg.github.com/$repo_name/$repo_name && docker push docker.pkg.github.com/$repo_name/$repo_name || true
