@@ -12,7 +12,7 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
   messages-app:
-    image: tal-leibman/messages-app-flask:latest
+    image: ghcr.io/tal-leibman/messages-app-flask:latest
     environment:
       - DATABASE_URL=postgres://test_user:test@127.0.0.1:5432/messages_db
       - PORT=5000
