@@ -1,20 +1,16 @@
 name: Publish Docker image
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
 jobs:
-  push_to_registry:
-    name: Push Docker image to GitHub Packages
+  build_test_image:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-      - name: Push to GitHub Packages
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: tal-leibman/messages-app-flask/messages-app-flask-image
-          tag_with_ref: true
-
+      - uses: actions/checkout@v2
+      - run: DATE_STRING=`date +%Y_%m_%d_%H:%M`
+      - run: IMAGE_NAME="$GITHUB_REPOSITORY_$DATE_STRING:test_build"
+      - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+      - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
+      - run: docker build . -t $IMAGE_NAME --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY
+      - run: docker tag $IMAGE_NAME docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/$GITHUB_REPOSITORY || true
