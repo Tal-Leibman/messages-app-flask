@@ -27,3 +27,11 @@ jobs:
           tags: ghcr.io/tal-leibman/messages-app-flask:latest
           cache-from: type=registry,ref=tal-leibman/messages-app-flask:latest
           cache-to: type=inline
+
+      - run:  docker-compose up --force-recreate --detach
+      - run: echo docker-ps
+      - uses: matt-ball/newman-action@master
+        with:
+          collection: postman_collection.json
+          environment: postman_environment.json
+
