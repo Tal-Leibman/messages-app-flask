@@ -24,4 +24,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: tal-leibman/messages-app-flask:latest
+          tags: ghcr.io/tal-leibman/messages-app-flask:latest
+          cache-from: type=registry,ref=tal-leibman/messages-app-flask:latest
+          cache-to: type=inline
