@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    network_mode: "host"
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=messages_db
+    ports:
+      - "127.0.0.1:5432:5432"
+  messages-app:
+    image: messages-app-flask:ci
+    environment:
+      - DATABASE_URL=postgres://test_user:test@127.0.0.1:5432/messages_db
+      - PORT=5000
+    depends_on:
+      - db
+    command: ["python","main.py","--debug=yes"]
+    network_mode: "host"
+    ports:
+      - "127.0.0.1:5000:5000"
