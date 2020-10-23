@@ -25,10 +25,10 @@ jobs:
         with:
           push: true
           tags: ghcr.io/tal-leibman/messages-app-flask:latest
-          cache-from: type=registry,ref=tal-leibman/messages-app-flask:latest
+          cache-from: type=registry,ref=ghcr.io/tal-leibman/messages-app-flask:latest
           cache-to: type=inline
-
-      - run:  docker-compose up --force-recreate --detach
+      - run:  docker-compose create
+      - run:  docker-compose up --detach
       - run: echo docker-ps
       - uses: matt-ball/newman-action@master
         with:
