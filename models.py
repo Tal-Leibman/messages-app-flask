@@ -2,7 +2,6 @@ import dataclasses
 from datetime import datetime
 from enum import Enum
 from typing import Optional
-
 import bcrypt
 from dataclasses_json import DataClassJsonMixin
 from flask_sqlalchemy import SQLAlchemy

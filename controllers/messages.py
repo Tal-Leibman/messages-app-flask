@@ -1,7 +1,7 @@
-import os
 from operator import or_
 
 from flask import Blueprint, abort, request
+from flask import current_app
 
 from decorators import auth_required
 from models import (
@@ -14,7 +14,6 @@ from models import (
 from models import db
 
 messages_bp = Blueprint("messages", __name__)
-MAX_MESSAGES_FETCH_COUNT = int(os.getenv("MAX_MESSAGES_FETCH_COUNT", "5"))
 
 
 @messages_bp.route("/write", methods=["POST"])
@@ -83,9 +82,10 @@ def get_messages(user: User, status: str):
         raise RuntimeError(
             "MessageFetchRequestStatus enum may have been changed received value"
         )
+    max_per_page = current_app.config["MAX_MESSAGES_FETCH_COUNT"]
     messages = (
         messages_query.order_by(Message.timestamp)
-        .paginate(max_per_page=MAX_MESSAGES_FETCH_COUNT, error_out=False)
+        .paginate(max_per_page=max_per_page, error_out=False)
         .items
     )
     messages_response = [
