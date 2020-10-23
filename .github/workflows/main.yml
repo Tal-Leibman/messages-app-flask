@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-      - run: docker pull docker.pkg.github.com/tal-leibman/messages-app-flask || true
-      - run: docker build . -t ${GITHUB_SHA:0:9} --cache-from=docker.pkg.github.com/tal-leibman/messages-app-flask
-      - run: docker tag latest docker.pkg.github.com/tal-leibman/messages-app-flask && docker push docker.pkg.github.com/tal-leibman/messages-app-flask || true
+      - run: docker pull docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image || true
+      - run: docker build . -t ${GITHUB_SHA:0:9} --cache-from=docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image
+      - run: docker tag latest docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image && docker push docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image || true
