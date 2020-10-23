@@ -15,6 +15,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: Tal-Leibman/messages-app-flask/messages-app-flask-image
+          repository: tal-leibman/messages-app-flask/messages-app-flask-image
           tag_with_ref: true
 
