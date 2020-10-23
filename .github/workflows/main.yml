@@ -12,5 +12,5 @@ jobs:
       - run: docker pull docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image || true
 #      - run: docker build . -t ${GITHUB_SHA:0:9} --cache-from=docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image
       - run: docker build . -t ${GITHUB_SHA:0:9}
-      - run: docker tag latest docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image:${GITHUB_SHA:0:9} && docker push docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image:${GITHUB_SHA:0:9} || true
+      - run: docker push docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image:${GITHUB_SHA:0:9}:latest
 #      - run: docker tag latest docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image:${GITHUB_SHA:0:9} && docker push docker.pkg.github.com/tal-leibman/messages-app-flask/messages-app-flask-image:${GITHUB_SHA:0:9} || true
