@@ -28,5 +28,5 @@ jobs:
           tags: ghcr.io/tal-leibman/messages-app-flask:latest
           cache-from: type=registry,ref=ghcr.io/tal-leibman/messages-app-flask:latest
           cache-to: type=inline
-      - run:  docker-compose up --abort-on-container-exit --no-start
+      - run:  docker-compose up --abort-on-container-exit
 
