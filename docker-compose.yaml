@@ -2,33 +2,32 @@ version: '3.8'
 
 services:
   db:
-    image: postgres
-    restart: always
-    network_mode: "host"
+    image: postgres:13.0-alpine
     environment:
       - POSTGRES_USER=test_user
       - POSTGRES_PASSWORD=test
       - POSTGRES_DB=messages_db
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
   messages-app:
     image: ghcr.io/tal-leibman/messages-app-flask:latest
     environment:
-      - DATABASE_URL=postgres://test_user:test@127.0.0.1:5432/messages_db
+      - DATABASE_URL=postgres://test_user:test@db:5432/messages_db
       - PORT=5000
     depends_on:
       - db
     command: ["python","main.py","--debug=yes"]
-    network_mode: "host"
     ports:
-      - "127.0.0.1:5000:5000"
+      - "5000:5000"
 
   api-test-newman:
-    image: postman/newman
+    image: postman/newman:5.2-alpine
     depends_on:
       - messages-app
-    network_mode: "host"
-    command: [ "newman","run","postman_collection.json" ,"--environment" ,"postman_environment.json" ]
+      - db
+    volumes:
+      - ./postman:/etc/newman
+    command: run postman_collection.json -e postman_environment.json
 
 
 
