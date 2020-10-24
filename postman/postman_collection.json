@@ -6,6 +6,69 @@
 	},
 	"item": [
 		{
+			"name": "Check service is up",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5c181c2-91ca-4da7-b397-02ad5e62e262",
+						"exec": [
+							"var expectedHttpStatus = 200;",
+							"var maxNumberOfTries = 5;",
+							"var sleepBetweenTries = 5000;",
+							"",
+							"if (!pm.environment.get(\"collection_tries\")) {",
+							"    pm.environment.set(\"collection_tries\", 1);",
+							"}",
+							"",
+							"if ((pm.response.code != expectedHttpStatus) && (pm.environment.get(\"collection_tries\") < maxNumberOfTries)) {",
+							"     var tries = parseInt(pm.environment.get(\"collection_tries\"), 10);",
+							"     pm.environment.set(\"collection_tries\", tries + 1);",
+							"     setTimeout(function() {}, sleepBetweenTries);",
+							"     postman.setNextRequest(request.name);",
+							" } else {",
+							"     pm.environment.unset(\"collection_tries\");",
+							"",
+							"     pm.test(\"Status code is \" + expectedHttpStatus, function () {",
+							"          pm.response.to.have.status(expectedHttpStatus);",
+							"     });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}",
+					"host": [
+						"{{host}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "register",
 			"event": [
 				{

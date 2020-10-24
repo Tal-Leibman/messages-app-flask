@@ -9,7 +9,7 @@ from models import db
 
 
 @click.command()
-@click.option("--debug", default=False,type=click.BOOL)
+@click.option("--debug", default=False, type=click.BOOL)
 @click.option("--port", type=int, envvar="PORT", help="Port to listen for requests")
 @click.option(
     "--db-url", envvar="DATABASE_URL", help="full sql data base connection url"
@@ -34,6 +34,10 @@ def main(debug, port, db_url, log_level, log_format, max_messages_fetch):
     db.create_all()
     app.register_blueprint(messages_bp, url_prefix="/messages")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+
+    @app.route("/")
+    def index():
+        return "ok"
 
     if debug:
         log.info("starting flask dev server")
