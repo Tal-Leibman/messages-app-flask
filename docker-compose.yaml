@@ -35,7 +35,7 @@ services:
       - db
     volumes:
       - ./postman:/etc/newman
-    command: run postman_collection.json -e postman_environment.json --timeout-request 150000
+    command: run postman_collection.json -e postman_environment.json --delay-request 5000
 
 
 networks:
