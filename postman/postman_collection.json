@@ -315,7 +315,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"{{user_1_email}}\",\n    \"password\": \"{{user_1_password}}\"\n}",
+					"raw": "{\n    \"email\": \"{{user_1_email}}\",\n    \"password\": \"this_is_not_the_password\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

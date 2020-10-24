@@ -1,3 +1,5 @@
 .github*
 Procfile
 README.md
+postman*
+wait-for-postgres.sh
