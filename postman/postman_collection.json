@@ -7,6 +7,20 @@
 	"item": [
 		{
 			"name": "register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d1a12d94-a4b1-43d7-a967-11b02e238975",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -18,7 +32,54 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"email\":\"{{new_user_email}}\",\"password\" : \"{{user_1_password}}\"}",
+					"raw": "{\"email\":\"{{user_1_email}}\",\"password\" : \"{{user_1_password}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register failed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2f9f5883-fae3-4fbd-a0ad-ca09e0c56795",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"{{user_1_email}}\",\"password\" : \"{{user_1_password}}\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -73,6 +134,120 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{user_1_email}}\",\n    \"password\": \"{{user_1_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login  wrong message body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "52a5d298-1a2c-4f63-bb29-47670a027d39",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0088a28c-05f7-41d1-8174-87daf95a524d",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{user_1_email}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login  wrong password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6e4683b9-0c0b-4bc0-acda-b1f7495bb63d",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c3d3ee20-a4f7-4d58-a155-9157013e3396",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
@@ -261,6 +436,56 @@
 			"response": []
 		},
 		{
+			"name": "register reciving user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f5768efa-ed66-423e-94be-4bcc4e22a939",
+						"exec": [
+							"let body = pm.response.json();",
+							"pm.environment.set(\"message_reciver_id\",body[\"user_id\"]);",
+							"pm.environment.set(\"user_2_token\",body[\"auth_token\"]);",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"{{user_2_email}}\",\"password\" : \"{{user_2_password}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "write_message",
 			"event": [
 				{
@@ -296,7 +521,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "{{message_sender_token}}",
+						"value": "{{user_1_token}}",
 						"type": "text"
 					}
 				],
@@ -427,7 +652,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "{{user_1_token}}",
+						"value": "{{user_2_token}}",
 						"type": "text"
 					}
 				],

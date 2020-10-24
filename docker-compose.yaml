@@ -9,14 +9,22 @@ services:
       - POSTGRES_DB=messages_db
     ports:
       - "5432:5432"
+    command: -c listen_addresses="*"
   messages-app:
     image: ghcr.io/tal-leibman/messages-app-flask:latest
     environment:
       - DATABASE_URL=postgres://test_user:test@db:5432/messages_db
       - PORT=5000
+      - PGPASSWORD=test
+      - PGUSER=test_user
+      - PGDATABASE=messages_db
+      - PGHOST=db
+      - PGPORT=5432
     depends_on:
       - db
-    command: ["python","main.py","--debug=yes"]
+    command: bash -c "/tmp/wait-for-postgres.sh && python main.py"
+    volumes:
+    - ./wait-for-postgres.sh:/tmp/wait-for-postgres.sh
     ports:
       - "5000:5000"
 
@@ -30,6 +38,8 @@ services:
     command: run postman_collection.json -e postman_environment.json
 
 
-
+networks:
+  test_network:
+    external: true
 
 
