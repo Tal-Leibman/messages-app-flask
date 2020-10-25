@@ -1,5 +1,6 @@
 
 ![Newman Api Test](https://github.com/Tal-Leibman/messages-app-flask/workflows/Newman%20Api%20Test/badge.svg?branch=master)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ### Prerequisites
 * python 3.8
