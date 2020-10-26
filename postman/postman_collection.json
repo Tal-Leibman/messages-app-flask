@@ -13,20 +13,9 @@
 					"script": {
 						"id": "e5c181c2-91ca-4da7-b397-02ad5e62e262",
 						"exec": [
-							"var expectedHttpStatus = 200;",
-							"var maxNumberOfTries = 5;",
-							"var sleepBetweenTries = 5000;",
-							"",
-							"if (!pm.environment.get(\"collection_tries\")) {",
-							"    pm.environment.set(\"collection_tries\", 1);",
-							"}",
-							"",
-							"if ((pm.response.code != expectedHttpStatus) && (pm.environment.get(\"collection_tries\") < maxNumberOfTries)) {",
-							"     var tries = parseInt(pm.environment.get(\"collection_tries\"), 10);",
-							"     pm.environment.set(\"collection_tries\", tries + 1);",
-							"     setTimeout(function() {}, sleepBetweenTries);",
-							"     postman.setNextRequest(request.name);",
-							" }"
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -174,10 +163,10 @@
 					"script": {
 						"id": "f7bc81fa-6d90-41c8-84bb-fc788a5e110f",
 						"exec": [
-							"let body = pm.response.json();",
-							"pm.environment.set(\"user_1_token\",body[\"auth_token\"]);",
 							"pm.test(\"Status test\", function () {",
 							"    pm.response.to.have.status(200);",
+							"    let body = pm.response.json();",
+							"    pm.environment.set(\"user_1_token\",body[\"auth_token\"]);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -444,17 +433,114 @@
 			"response": []
 		},
 		{
-			"name": "login_again_same_user",
+			"name": "register reciving user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f5768efa-ed66-423e-94be-4bcc4e22a939",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"{{user_2_email}}\",\"password\" : \"{{user_2_password}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login reciving user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "33aa8d91-4c0a-481b-a22c-577d01392f90",
+						"exec": [
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    let body = pm.response.json();",
+							"    pm.environment.set(\"user_2_id\",body[\"user_id\"]);",
+							"    pm.environment.set(\"user_2_token\",body[\"auth_token\"]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"{{user_2_email}}\",\"password\" : \"{{user_2_password}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login sender user",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "877acd99-3dd2-4771-9e02-7d85c5ec58f3",
 						"exec": [
-							"let body = pm.response.json();",
-							"pm.environment.set(\"user_1_token\",body[\"auth_token\"]);",
 							"pm.test(\"Status test\", function () {",
 							"    pm.response.to.have.status(200);",
+							"    let body = pm.response.json();",
+							"    pm.environment.set(\"user_1_token\",body[\"auth_token\"]);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -503,56 +589,6 @@
 			"response": []
 		},
 		{
-			"name": "register reciving user",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "f5768efa-ed66-423e-94be-4bcc4e22a939",
-						"exec": [
-							"let body = pm.response.json();",
-							"pm.environment.set(\"message_reciver_id\",body[\"user_id\"]);",
-							"pm.environment.set(\"user_2_token\",body[\"auth_token\"]);",
-							"pm.test(\"Status test\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"email\":\"{{user_2_email}}\",\"password\" : \"{{user_2_password}}\"}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/auth/register",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"auth",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "write_message",
 			"event": [
 				{
@@ -594,7 +630,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"receiver_id\": {{message_reciver_id}},\n    \"body\": \"Some text to send in a message\",\n    \"subject\": \"Hello\"\n}",
+					"raw": "{\n    \"receiver_id\": {{user_2_id}},\n    \"body\": \"Some text to send TEST in a message\",\n    \"subject\": \"Hello\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -615,7 +651,7 @@
 			"response": []
 		},
 		{
-			"name": "read_message",
+			"name": "read_message recived 1 message",
 			"event": [
 				{
 					"listen": "test",
@@ -624,6 +660,10 @@
 						"exec": [
 							"pm.test(\"Status test\", function () {",
 							"    pm.response.to.have.status(200);",
+							"    pm.test(\"Validate response\", function () {",
+							"        var jsonData = pm.response.json();",
+							"        pm.expect(jsonData.sent_from).to.eql(pm.environment.get(\"user_1_email\"));",
+							"    });",
 							"});"
 						],
 						"type": "text/javascript"
@@ -653,8 +693,76 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "{{user_1_token}}",
+						"value": "{{user_2_token}}",
 						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}//messages/read",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"",
+						"messages",
+						"read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "read_message no messages",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2e1cd2f7-f8f1-4088-8c92-709f09dfe259",
+						"exec": [
+							"pm.test(\"No messages test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    console.log(jsonData);",
+							"    pm.expect(jsonData.status.includes(\"no unread messages for user.email\"))",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5272067e-61a5-43c7-80a2-5d1a9fbf2bfe",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "{{user_2_token}}"
 					}
 				],
 				"body": {
@@ -698,8 +806,11 @@
 					"script": {
 						"id": "ce17f736-a4a8-4304-aeba-e3915330f09f",
 						"exec": [
-							"pm.test(\"Status test\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Assert messages length\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"message_id_to_delete\",jsonData.messages[0].message_id)",
+							"    pm.expect(jsonData.messages.length).to.eql(1);",
+							"",
 							"});"
 						],
 						"type": "text/javascript"
@@ -733,13 +844,154 @@
 					}
 				},
 				"url": {
-					"raw": "{{host}}/messages/{{message_state_all}}?page=1&per_page=5",
+					"raw": "{{host}}/messages/all/inbox?page=1&per_page=5",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"messages",
-						"{{message_state_all}}"
+						"all",
+						"inbox"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete message as receiver",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "829cc0bd-c0b1-46a7-8a02-3f814907495c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "04dc706d-53bd-4979-8906-3964c65404e0",
+						"exec": [
+							"pm.test(\"Your test name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"ok\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "{{user_2_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/messages/{{message_id_to_delete}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"messages",
+						"{{message_id_to_delete}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get message as sedner after delete by reciver",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6b85d6d7-beaa-40bc-91ee-7b8d209dc52c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "381cb52d-c8c2-457b-a70d-fd9ad52e3e92",
+						"exec": [
+							"pm.test(\"Your test name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.messages.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "{{user_1_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/messages/all/outbox?page=1&per_page=5",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"messages",
+						"all",
+						"outbox"
 					],
 					"query": [
 						{
