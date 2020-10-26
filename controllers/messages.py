@@ -1,4 +1,4 @@
-from operator import or_
+from typing import Literal
 
 from flask import Blueprint, abort, request
 from flask import current_app
@@ -10,6 +10,7 @@ from models import (
     MessageResponse,
     ParseWriteMessageRequest,
     MessageFetchRequestStatus,
+    MessagesUsers,
 )
 from models import db
 
@@ -23,14 +24,16 @@ def write_message(user: User):
     message_receiver = User.get_by_id(request_data.receiver_id)
     if message_receiver is None:
         abort(404, "message receiver not found")
-    db.session.add(
-        Message(
-            sender_id=user.id,
-            receiver_id=message_receiver.id,
-            body=request_data.body,
-            subject=request_data.subject,
+
+    for viewer_id in (user.id, request_data.receiver_id):
+        db.session.add(
+            MessagesUsers(
+                viewer_id=viewer_id,
+                sender_id=user.id,
+                receiver_id=message_receiver.id,
+                message=Message(body=request_data.body, subject=request_data.subject,),
+            )
         )
-    )
     db.session.commit()
     return {"status": "ok"}
 
@@ -38,30 +41,29 @@ def write_message(user: User):
 @messages_bp.route("/read", methods=["GET"])
 @auth_required
 def read_message(user: User):
-    message = (
-        user.messages_received.filter(Message.is_read == False)
+    msg = (
+        user.messages(status=MessageFetchRequestStatus.all_unread, inbox_outbox="inbox")
         .order_by(Message.timestamp)
         .first()
     )
-    if message is None:
+    if msg is None:
         return {"status": f"no unread messages for {user.email=}"}
-    from_user = User.get_by_id(message.receiver_id)
-    message: Message
-    message.is_read = True
+    msg: MessagesUsers
+    msg.is_read = True
     db.session.commit()
     response = MessageResponse(
-        message_id=message.id,
-        sent_from=from_user.email,
-        subject=message.subject,
-        body=message.body,
-        timestamp=message.timestamp,
+        message_id=msg.message.id,
+        sent_from=msg.sender.email,
+        subject=msg.message.subject,
+        body=msg.message.body,
+        timestamp=msg.message.timestamp,
     )
     return response.to_json()
 
 
-@messages_bp.route("/<status>", methods=["GET"])
+@messages_bp.route("/<status>/<inbox_outbox>", methods=["GET"])
 @auth_required
-def get_messages(user: User, status: str):
+def get_messages(user: User, status: str, inbox_outbox: Literal["inbox", "outbox"]):
     """
     to use pagination send query params page and per_page
     """
@@ -72,43 +74,32 @@ def get_messages(user: User, status: str):
             400,
             f"Provided {status=} invalid, use {[_status.value for _status in MessageFetchRequestStatus]}",
         )
-    if status.value == MessageFetchRequestStatus.all_read.value:
-        messages_query = user.messages_received.filter(Message.is_read == True)
-    elif status.value == MessageFetchRequestStatus.all_unread.value:
-        messages_query = user.messages_received.filter(Message.is_read == False)
-    elif status.value == MessageFetchRequestStatus.all.value:
-        messages_query = user.messages_received
-    else:
-        raise RuntimeError(
-            "MessageFetchRequestStatus enum may have been changed received value"
-        )
+
+    messages_query = user.messages(status, inbox_outbox)
     max_per_page = current_app.config["MAX_MESSAGES_FETCH_COUNT"]
     messages = (
         messages_query.order_by(Message.timestamp)
         .paginate(max_per_page=max_per_page, error_out=False)
         .items
     )
+    m: MessagesUsers
     messages_response = [
         MessageResponse(
-            message_id=m.id,
+            message_id=m.message_id,
             sent_from=m.sender.email,
-            subject=m.subject,
-            body=m.body,
-            timestamp=m.timestamp,
+            subject=m.message.subject,
+            body=m.message.body,
+            timestamp=m.message.timestamp,
         )
         for m in messages
     ]
-
     return {"status": "ok", "messages": messages_response}
 
 
 @messages_bp.route("/<message_id>", methods=["DELETE"])
 @auth_required
 def delete_message(user: User, message_id: str):
-    message = Message.query.filter(
-        Message.id == message_id,
-        or_(Message.receiver_id == user.id, Message.sender_id == user.id),
-    ).first()
+    message = MessagesUsers.get_by_viewer_id(user.id, message_id)
     if message is None:
         return {"status": f"no message found  {message_id=} and {user.email=}"}
     db.session.delete(message)
