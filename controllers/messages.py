@@ -24,16 +24,16 @@ def write_message(user: User):
     message_receiver = User.get_by_id(request_data.receiver_id)
     if message_receiver is None:
         abort(404, "message receiver not found")
-
-    for viewer_id in (user.id, request_data.receiver_id):
-        db.session.add(
-            MessagesUsers(
-                viewer_id=viewer_id,
-                sender_id=user.id,
-                receiver_id=message_receiver.id,
-                message=Message(body=request_data.body, subject=request_data.subject,),
-            )
-        )
+    message = Message(
+        body=request_data.body,
+        subject=request_data.subject,
+        sender=user,
+        receiver=message_receiver,
+    )
+    db.session.add(message)
+    db.session.flush()
+    for _id in (user.id, message_receiver.id):
+        db.session.add(MessagesUsers(message_id=message.id, viewer_id=_id))
     db.session.commit()
     return {"status": "ok"}
 
@@ -49,11 +49,11 @@ def read_message(user: User):
     if msg is None:
         return {"status": f"no unread messages for {user.email=}"}
     msg: MessagesUsers
-    msg.is_read = True
+    msg.message.is_read = True
     db.session.commit()
     response = MessageResponse(
-        message_id=msg.message.id,
-        sent_from=msg.sender.email,
+        message_id=msg.message_id,
+        sent_from=msg.message.sender.email,
         subject=msg.message.subject,
         body=msg.message.body,
         timestamp=msg.message.timestamp,
@@ -86,7 +86,7 @@ def get_messages(user: User, status: str, inbox_outbox: Literal["inbox", "outbox
     messages_response = [
         MessageResponse(
             message_id=m.message_id,
-            sent_from=m.sender.email,
+            sent_from=m.message.sender.email,
             subject=m.message.subject,
             body=m.message.body,
             timestamp=m.message.timestamp,

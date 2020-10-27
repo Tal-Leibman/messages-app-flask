@@ -28,23 +28,13 @@ class MessageFetchRequestStatus(Enum):
 
 class MessagesUsers(db.Model):
     __tablename__ = "messages_users"
-
     message_id = Column(Integer, ForeignKey("message.id"), primary_key=True)
     message = relationship("Message", foreign_keys=[message_id])
-
     viewer_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
     viewer = relationship("User", foreign_keys=[viewer_id])
 
-    sender_id = Column(Integer, ForeignKey("user.id"))
-    receiver_id = Column(Integer, ForeignKey("user.id"))
-    sender = relationship("User", foreign_keys=[sender_id])
-    receiver = relationship("User", foreign_keys=[receiver_id])
-    is_read = Column(Boolean, nullable=False, default=False)
-
     @classmethod
-    def get_by_viewer_id(
-        cls, viewer_id: str, message_id
-    ) -> Optional["MessagesUsers"]:
+    def get_by_viewer_id(cls, viewer_id: str, message_id) -> Optional["MessagesUsers"]:
         return cls.query.filter(
             MessagesUsers.viewer_id == viewer_id, MessagesUsers.message_id == message_id
         ).first()
@@ -53,9 +43,14 @@ class MessagesUsers(db.Model):
 class Message(db.Model):
     __tablename__ = "message"
     id = Column(Integer, primary_key=True, autoincrement=True)
+    sender_id = Column(Integer, ForeignKey("user.id"))
+    receiver_id = Column(Integer, ForeignKey("user.id"))
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
     body = Column(String(1000), nullable=False)
     subject = Column(String(160), nullable=False)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+    is_read = Column(Boolean, nullable=False, default=False)
 
 
 class User(db.Model):
@@ -92,15 +87,15 @@ class User(db.Model):
             MessagesUsers.viewer_id == self.id
         )
         if inbox_outbox == "inbox":
-            query = query.filter(MessagesUsers.receiver_id == self.id)
+            query = query.filter(Message.receiver_id == self.id)
         elif inbox_outbox == "outbox":
-            query = query.filter(MessagesUsers.sender_id == self.id)
+            query = query.filter(Message.sender_id == self.id)
         else:
             raise ValueError(f"Wrong value for {inbox_outbox=}")
         if status == MessageFetchRequestStatus.all_read:
-            query = query.filter(MessagesUsers.is_read == True)
+            query = query.filter(Message.is_read == True)
         elif status == MessageFetchRequestStatus.all_unread:
-            query = query.filter(MessagesUsers.is_read == False)
+            query = query.filter(Message.is_read == False)
         return query
 
     @classmethod
